@@ -1,9 +1,18 @@
-# Portifólio_Power BI
+# Projeto_Imob
 
-Bem vindos (as)! Este é um repositório de relatórios feitos por mim na ferramenta de data viz Power BI. Em cada pasta está um relatório diferente, junto com um README.md explicando mais sobre as etapas de ETL e construção dos visuais.
+Esse relatório foi desenvolvido para uma empresa do ramo de Tecnologia da Informação e possui dados fictícios.
+Projeto - Web Scraping com PYTHON [BeautifulSoup - Selenium] + POWER BI
 
-**Link dos projetos publicados no Power BI Serviço:**
+Desenvolvi uma ferramenta no Power BI que unifica os dados das imobiliárias da minha cidade, permitindo de maneira fácil e rápida ter acesso aos imóveis disponíveis para aluguel e venda na cidade e região.
 
-- [Financeiro](https://app.powerbi.com/view?r=eyJrIjoiZjllNjAwNDktYmE4MS00NjdhLThjYWUtNzgyMjZlYjBhODUyIiwidCI6ImI3MGRlMDJiLTNjMTktNDBjMi04N2U0LWYyNmQ5NDA3ZDdhMCJ9)
-- [People Analytics](https://app.powerbi.com/groups/me/reports/90f78641-77cf-4e43-a897-0164eed18e5b/ReportSection?experience=power-bi)
+Fiz este projeto como forma de estudo do python, que é é uma ferramenta incrível para o profissional de dados.
+
+Em resumo, realizei as seguintes etapas:
+1. Desenvolvi os scripts em python para fazer o web scraping dos sites utilizando as bibliotecas Beautiful Soup e Selenium;
+2. Criei uma tarefa no Agendador de Tarefas do Windows para automatizar a rotina de execução dos scripts;
+3. Construí a identidade visual da ferramenta (nome, logo, BG...);
+4. Levei para o Power BI os arquivos com os dados dos imóveis, criei uma página de busca de imóveis e outras 2 com análises diversas;
+5. Publiquei, agendei a atualização automática e inseri o link do relatório em um site.
+
+- [Reunimob](http://reunimob.com.br)
 
