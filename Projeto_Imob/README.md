@@ -5,8 +5,6 @@ Projeto - Web Scraping com PYTHON [Beautiful Soup e Selenium] + POWER BI
 
 Desenvolvi uma ferramenta no Power BI que unifica os dados das imobiliárias da minha cidade, permitindo de maneira fácil e rápida ter acesso aos imóveis disponíveis para aluguel e venda na cidade e região.
 
-Fiz este projeto como forma de estudo do python, que é é uma ferramenta incrível para o profissional de dados.
-
 Em resumo, realizei as seguintes etapas:
 1. Desenvolvi os scripts em python para fazer o web scraping dos sites utilizando as bibliotecas Beautiful Soup e Selenium;
 2. Criei uma tarefa no Agendador de Tarefas do Windows para automatizar a rotina de execução dos scripts;
