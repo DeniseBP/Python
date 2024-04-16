@@ -12,5 +12,5 @@ Em resumo, realizei as seguintes etapas:
 4. Levei para o Power BI os arquivos com os dados dos imóveis, criei uma página de busca de imóveis e outras 2 com análises diversas;
 5. Publiquei, agendei a atualização automática e inseri o link do relatório em um site.
 
-- [Reunimob](http://reunimob.com.br)
+- [LINK Reunimob](http://reunimob.com.br)
 
