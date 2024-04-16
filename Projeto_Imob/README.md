@@ -1,7 +1,6 @@
 # Projeto_Imob
 
-Esse relatório foi desenvolvido para uma empresa do ramo de Tecnologia da Informação e possui dados fictícios.
-Projeto - Web Scraping com PYTHON [Beautiful Soup e Selenium] + POWER BI
+Projeto Web Scraping com PYTHON [Beautiful Soup e Selenium] + POWER BI
 
 Desenvolvi uma ferramenta no Power BI que unifica os dados das imobiliárias da minha cidade, permitindo de maneira fácil e rápida ter acesso aos imóveis disponíveis para aluguel e venda na cidade e região.
 
