@@ -12,7 +12,6 @@ import send_email  # importando função genérica
 total_venda = 0
 total_locacao = 0
 
-
 # Função para obter o conteúdo HTML de uma página
 
 
@@ -31,7 +30,7 @@ def obter_site(url):
         print(f"Falha na requisição. Status code: {response.status_code}")
         registrar_log('Erro na obtenção do site', str(e), None)
 
-# Função para extrair o numero de páginas a iterar
+    # Função para obter o número de páginas a iterar
 
 
 def obter_numero_de_paginas(url):
@@ -46,9 +45,6 @@ def obter_numero_de_paginas(url):
         sys.exit()  # Encerra o script se houver erro na obtenção do site
 
     try:
-        # Encontrar o elemento de paginação
-        paginacao_element = soup.find_all('a', class_='lipagina-btn-paginacao')
-        ultima_pagina = paginacao_element[-2].get_text()
         # Encontrar o elemento de paginação
         paginacao_element = soup.find_all('a', class_='lipagina-btn-paginacao')
         ultima_pagina = paginacao_element[-2].get_text()
@@ -86,16 +82,14 @@ def registrar_log(pagina_executada, tipo_transacao, qtd_imoveis_por_pagina):
     with open("log_execucao.txt", "a") as arquivo_log:
         arquivo_log.write(log_info)
 
-
 # Função para extrair dados de uma página e escrever no arquivo CSV
+
 
 def extrair_e_escrever_dados(url, arquivo, tipo_transacao, pagina_atual):
     global total_venda, total_locacao
-    # Inicialize a variável de contagem
-    qtd_imoveis_pagina = 0
-
     soup = obter_site(url)
-    imoveis = soup.find_all('a')
+    # Slicing [:-1] no final da linha para selecionar todos os elementos da lista imoveis, exceto o último elemento, que é a paginação do site
+    imoveis = soup.find_all('div', class_='imovelcard')[:-1]
 
     with open(arquivo, 'a', newline='', encoding='utf-8') as f:
         csv_writer = csv.writer(f, delimiter=';')
@@ -103,109 +97,70 @@ def extrair_e_escrever_dados(url, arquivo, tipo_transacao, pagina_atual):
         for imovel in imoveis:
             # Capitalizar a primeira letra de cada palavra e corrigir Locação
             negocio = tipo_transacao.capitalize().replace("Locacao", "Locação")
-            img_tag = imovel.find('img')
-            if img_tag:
-                url_imagem = img_tag['src']
-                if not url_imagem.startswith('/'):
-                    localizacao_element = imovel.find_next('h2')
-                    descricao_element = imovel.find_next('h3')
+            tipo_element = imovel.find('p', class_='imovelcard__info__ref')
+            # Verificar se o caractere "-"" está presente na string
+            if "-" in tipo_element.get_text(strip=True):
+                tipo = tipo_element.get_text(strip=True).split(
+                    "-")[1].strip() if tipo_element else "N/A"
+            else:
+                tipo = tipo_element.get_text(
+                    strip=True) if tipo_element else "N/A"
 
-                    # Obter somente o texto contido nos elementos acima. O método get_text() é usado para extrair o texto de uma tag HTML
-                    # O argumento strip=True remove espaços em branco no início e no final do texto
-                    localizacao = localizacao_element.get_text(
-                        strip=True) if localizacao_element else "N/A"
-                    # Aqui tb estamos tirando as quebras de linha com o replace('\n', ''))
-                    descricao = (descricao_element.get_text(strip=True).replace(
-                        '\n', '')) if descricao_element else "N/A"
+            if tipo != "N/A":
+                preco_element = imovel.find(
+                    'p', class_='imovelcard__valor__valor')
+                bairro_cidade_element = imovel.find(
+                    'h2', class_='imovelcard__info__local')
+                # Verificar se a descrição está vazia, se estiver, tentar buscar de outro elemento para reduzirmos ao maximo a qtd de N/A
+                descricao_element = imovel.find('h3')
+                if descricao_element is None or descricao_element.text.strip() == "":
+                    descricao_element = imovel.find(
+                        'div', class_='imovelcard__info__feature')
 
-                    # Obter Link do imovel
-                    # Trazer parte codigo html que contém parte do link do imovel
-                    link_imovel_tag = imovel.find_next('a')
-                    # Expressão regular para encontrar texto entre aspas
-                    padrao = r'"([^"]*)"'
-                    # Encontrar todas as correspondências na string usando a expressão regular
-                    correspondencias = re.findall(padrao, str(link_imovel_tag))
-                    # O primeiro item da lista corresponde ao texto entre aspas
-                    link_imovel = 'http://www.ovsimoveis.com.br' + \
-                        correspondencias[0] if correspondencias else "N/A"
+                # Obter somente o texto contido nos elementos acima. O método get_text() é usado para extrair o texto de uma tag HTML. O argumento strip=True remove espaços em branco no início e no final do texto
+                preco = preco_element.get_text(
+                    strip=True) if preco_element else "N/A"
+                bairro_cidade = bairro_cidade_element.get_text(
+                    strip=True) if bairro_cidade_element else "N/A"
 
-                    # Dividir a localização em partes: Tipo, Bairro/Cidade e Preço
-                    # Verificando quantas vezes 'para' aparece na localizacao
-                    ocorrencias_para = localizacao.count("para")
+                # Aqui estamos tirando as quebras de linha com o replace
+                descricao = (descricao_element.get_text(strip=True).replace(
+                    '\n', '').replace('\r', '')) if descricao_element else "N/A"
 
-                    if ocorrencias_para == 1:
-                        # Se 'para' aparece apenas uma vez, faça o split normalmente
-                        partes = localizacao.split("para")
-                    else:
-                        # Se 'para' aparece mais de uma vez, faça o split pela última posição
-                        ultima_posicao_para = localizacao.rfind("para")
-                        partes = [localizacao[:ultima_posicao_para],
-                                  localizacao[ultima_posicao_para + len("para"):]]
+                # Separar Cidade e Bairro
+                cidade = bairro_cidade.split(
+                    ",")[1].strip() if ',' in bairro_cidade else "N/A"
+                # ajuste para extrair somente o texto antes da /. Ex: Cataguases / MG, irá extrair Cataguases
+                padrao = r'^([^/]+)'
+                resultado = re.match(padrao, cidade)
+                cidade = resultado.group(1).strip()
 
-                    tipo = partes[0].strip()
+                bairro = bairro_cidade.split(
+                    ",")[0].strip() if ',' in bairro_cidade else bairro_cidade.strip()
 
-                    # dividindo Bairro/Cidade e Preço
-                    bairro_cidade_preco = partes[1].split(negocio)[1].strip()
+                # Obter Link do imovel e url imagem
+                url_imagem = imovel.find_next('a').find('img')['src']
+                link_imovel = 'https://www.moradaimoveiskta.com.br' + \
+                    imovel.find_next('a')['href']
 
-                    if 'Consulte' in bairro_cidade_preco:
-                        bairro_cidade = bairro_cidade_preco.split('Consulte')[
-                            0].strip()
-                        preco = 'Consulte'
-                    elif 'R$' in bairro_cidade_preco:
-                        bairro_cidade = bairro_cidade_preco.split('R$')[
-                            0].strip()
-                        preco = 'R$' + \
-                            bairro_cidade_preco.split('R$')[1].strip()
-                    else:
-                        bairro_cidade = bairro_cidade_preco.strip()
-                        preco = "N/A"
+                csv_writer.writerow(
+                    [tipo, negocio, cidade, bairro, preco, descricao, url_imagem, link_imovel])
 
-                    # dividindo Bairro/Cidade
-                    ocorrencias_traco = bairro_cidade.count("-")
+                print("Tipo:", tipo)
+                print("Negocio:", negocio)
+                print("Cidade:", cidade)
+                print("Bairro:", bairro)
+                print("Preco:", preco)
+                print("Descricao:", descricao)
+                print("URL da imagem:", url_imagem)
+                print("Link do imovel:", link_imovel)
+                print("-" * 50)
 
-                    if ocorrencias_traco == 1:
-                        # Se '-' aparece apenas uma vez, faça o split normalmente
-                        partes = bairro_cidade.split("-")
-                        cidade = partes[0].strip()
-                        # ajuste para extrair somente o texto antes da /. Ex: Cataguases / MG, irá extrair Cataguases
-                        padrao = r'^([^/]+)'
-                        resultado = re.match(padrao, cidade)
-                        cidade = resultado.group(1).strip()
-
-                        bairro = partes[1].strip()
-                    else:
-                        # Se '-' não aparece
-                        cidade = bairro_cidade
-                        # ajuste para extrair somente o texto antes da /. Ex: Cataguases / MG, irá extrair Cataguases
-                        padrao = r'^([^/]+)'
-                        resultado = re.match(padrao, cidade)
-                        cidade = resultado.group(1).strip()
-
-                        bairro = "N/A"
-
-                    # Escreva no arquivo CSV
-                    csv_writer.writerow(
-                        [tipo, negocio, cidade, bairro, preco, descricao, url_imagem, link_imovel])
-
-                    # Imprimir informações do imóvel
-                    print("Negocio:", negocio)
-                    print("Tipo:", tipo)
-                    print("Cidade:", cidade)
-                    print("Bairro:", bairro)
-                    print("Preco:", preco)
-                    print("Descricao:", descricao)
-                    print("URL da imagem:", url_imagem)
-                    print("Link do imovel:", link_imovel)
-                    print("-" * 50)
-
-                    # Incrementa a contagem de imoveis processados nesta página
-                    qtd_imoveis_pagina += 1
-
-        # Retorna a quantidade de itens inseridos nesta página
+        # Contar a quantidade de imóveis processados nesta página
+        qtd_imoveis_pagina = len(imoveis)
         qtd_imoveis_por_pagina = f'{qtd_imoveis_pagina} imóveis encontrados'
 
         # Atualizar o somatório da quantidade de imóveis para venda ou locação
-
         if tipo_transacao == 'venda':
             total_venda += qtd_imoveis_pagina
         elif tipo_transacao == 'locacao':
@@ -215,7 +170,6 @@ def extrair_e_escrever_dados(url, arquivo, tipo_transacao, pagina_atual):
         pagina_executada = f'page {pagina_atual}'
         # Registrar o log
         registrar_log(pagina_executada, tipo_transacao, qtd_imoveis_por_pagina)
-
 
 # Função para salvar os dados em um arquivo csv
 
@@ -228,18 +182,18 @@ def salvar_dados(arquivo_csv):
     with open(arquivo_csv, 'a', newline='', encoding='UTF-8') as f:
         f.write('Tipo;Negocio;Cidade;Bairro;Preco;Descricao;UrlImagem;LinkImovel\n')
 
-
 # Função principal
-def main():
 
+
+def main():
     # URLs para os diferentes tipos de finalidade e número de páginas para iterar
     urls = {
-        'venda': ('http://www.ovsimoveis.com.br/imovel/?finalidade=venda&tipo=&bairro=0&suites=&banheiros=&vagas=&dormitorios='),
-        'locacao': ('http://www.ovsimoveis.com.br/imovel/?finalidade=locacao&tipo=&bairro=0&suites=&banheiros=&vagas=&dormitorios=')
+        'venda': ('https://www.moradaimoveiskta.com.br/imovel/?finalidade=venda&tipo=&bairro=0&sui=&ban=&gar=&dor='),
+        'locacao': ('https://www.moradaimoveiskta.com.br/imovel/?finalidade=locacao&tipo=&bairro=0&sui=&ban=&gar=&dor=')
     }
 
     # Nome do arquivo CSV
-    nome_arquivo = 'imoveis_dados_ovs.csv'
+    nome_arquivo = 'imoveis_dados_morada.csv'
 
     # Caminho do arquivo CSV
     arquivo_csv = 'C:\\Users\\denis\\OneDrive\\Documentos\\Projeto_Imob\\' + nome_arquivo
