@@ -42,6 +42,8 @@ Link com passo a passo etapa 2: [Passo a passo agendar tarefa](https://medium.co
 
 ## Detalhamento etapa 4:
 
+### Obter no PBI os arquivos da pasta do Google Drive - Script do Python
+
 1- Criar credenciais de autenticação para o Google Drive
 2- Desenvolver o script em python para obter os IDs de todos os arquivos
 3- Instalar bibliotecas pandas e matplotlib
