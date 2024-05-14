@@ -13,3 +13,13 @@ Em resumo, realizei as seguintes etapas:
 
 Link projeto publicado: [Reunimob](http://reunimob.com.br)
 
+## Detalhamento etapa 4:
+
+1- Criar credenciais de autenticação para o Google Drive
+2- Desenvolver o script em python para obter os IDs de todos os arquivos
+3- Instalar bibliotecas pandas e matplotlib
+4- Obter dados no PBI Desktop com conector 'Script do Python' e depois criar algumas etapas no PQ para compor as urls dos arquivos
+5- Tornar as fonte de dados públicas
+6- Instalar gateway para agendar atualização no PBI online
+
+Link com passo a passo etapa 4: [Passo a passo obtenção arquivos ](https://www.canva.com/design/DAGFJcQfKNo/32Jbv1DKN0ztbOfFokBy2Q/view?utm_content=DAGFJcQfKNo&utm_campaign=designshare&utm_medium=link&utm_source=editor)
